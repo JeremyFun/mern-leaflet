@@ -14,11 +14,13 @@ const schema = Joi.object().keys({
 const router = express.Router();
 
 router.get('/', (req, res) => {
-    res.json([])
+    messages.find().then(message => {
+        res.json(message)
+    })
 });
 
 router.post('/', (req, res, next) => {
-    const result = schema.validate(req.body, schema)
+    const result = schema.validate(req.body)
     if (result.error === null) {
         const {name, message, latitude, longitude} = req.body
         const userMessage = {
@@ -28,7 +30,6 @@ router.post('/', (req, res, next) => {
             longitude,
             date: new Date()
         };
-        console.log(req.body, 'req.body')
         messages
             .insert(userMessage)
             .then(insertedMessage => {

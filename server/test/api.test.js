@@ -35,7 +35,7 @@ describe('POST /api/v1/messages', () => {
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(res => {
-                console.log(res.body, 'body')
+                console.log(res, 'res')
                 res.body._id = '5b57d127923211248855977c';
                 res.body.date = '2018-07-25T01:23:51.029Z';
             })
