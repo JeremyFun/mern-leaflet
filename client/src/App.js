@@ -3,6 +3,7 @@ import './App.css';
 
 import {Map, TileLayer, Marker, Popup} from 'react-leaflet'
 import L from 'leaflet'
+import Joi from 'joi'
 
 import {
     CardText, CardBody,
@@ -18,6 +19,13 @@ export const pointerIcon = new L.Icon({
     popupAnchor: [0, -41],
 })
 
+const schema = Joi.object().keys({
+    name: Joi.string().min(1).max(500).required(),
+    message: Joi.string().min(1).max(500).required(),
+})
+
+const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:5000/api/v1/messages' : 'production_url_here'
+
 class App extends React.Component {
     state = {
         location: {
@@ -29,11 +37,22 @@ class App extends React.Component {
         userMessage: {
             name: '',
             message: ''
-        }
+        },
+        sendingMessage: false,
+        sentMessage: false,
+        messages: []
     }
 
     componentDidMount() {
-        navigator.geolocation.getCurrentPosition((position) => {
+        fetch(API_URL)
+            .then(res => res.json())
+            .then(messages => {
+                this.setState({
+                    messages
+                })
+            })
+
+            navigator.geolocation.getCurrentPosition((position) => {
             this.setState({
                 location: {
                     lat: position.coords.latitude,
@@ -59,9 +78,51 @@ class App extends React.Component {
         });
     }
 
+    formIsValid = () => {
+        const userMessage = {
+            name: this.state.userMessage.name,
+            message: this.state.userMessage.message
+        }
+        const result = schema.validate(userMessage)
+
+        if (this.state.haveUserLocation) {
+            if (!result.error) {
+                return true
+            }
+            return false
+        }
+    }
+
     formSubmitted = (event) => {
         event.preventDefault()
-        console.log(this.state.userMessage)
+        this.setState({
+            sendingMessage: true
+        })
+        if (this.formIsValid()) {
+            debugger;
+            fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: this.state.userMessage.name,
+                    message: this.state.userMessage.message,
+                    latitude: this.state.location.lat,
+                    longitude: this.state.location.lng
+                })
+            })
+                .then(res => res.json())
+                .then(message => {
+                    console.log(message)
+                    setTimeout(() => {
+                        this.setState({
+                            sendingMessage: false,
+                            sentMessage: true
+                        })
+                    }, 4000)
+                })
+        }
     }
 
     valueChanged = (event) => {
@@ -69,7 +130,7 @@ class App extends React.Component {
         this.setState((prevState) => ({
             userMessage: {
                 ...prevState.userMessage,
-                [name] : value
+                [name]: value
             }
         }))
     }
@@ -92,32 +153,46 @@ class App extends React.Component {
                             </Marker>
                             : ""
                     }
+                    {
+                        this.state.messages.map(message => {
+                            return (<Marker position={[message.latitude, message.longitude]} icon={pointerIcon}>
+                                <Popup>
+                                    <em>{message.name}</em>: {message.message}
+                                </Popup>
+                            </Marker>)
+                        })
+                    }
                 </Map>
                 <CardBody className="message-form">
                     <CardTitle>Welcome to GuestM.app</CardTitle>
                     <CardText>Leave a message with your location!</CardText>
                     <CardText>Thanks for stopping by!</CardText>
-                    <Form onSubmit={this.formSubmitted}>
-                        <FormGroup>
-                            <Label for="name">Name</Label>
-                            <Input
-                                onChange={this.valueChanged}
-                                type="text"
-                                name="name"
-                                id="name"
-                                placeholder="Enter your name"/>
-                        </FormGroup>
-                        <FormGroup>
-                            <Label for="message">Message</Label>
-                            <Input
-                                onChange={this.valueChanged}
-                                type="textarea"
-                                name="message"
-                                id="message"
-                                placeholder="Enter a message"/>
-                        </FormGroup>
-                        <Button type="submit" color="info" disabled={!this.state.haveUserLocation}>Send</Button>
-                    </Form>
+                    {!this.state.sendingMessage && !this.state.sentMessage && this.state.haveUserLocation ?
+                        <Form onSubmit={this.formSubmitted}>
+                            <FormGroup>
+                                <Label for="name">Name</Label>
+                                <Input
+                                    onChange={this.valueChanged}
+                                    type="text"
+                                    name="name"
+                                    id="name"
+                                    placeholder="Enter your name"/>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for="message">Message</Label>
+                                <Input
+                                    onChange={this.valueChanged}
+                                    type="textarea"
+                                    name="message"
+                                    id="message"
+                                    placeholder="Enter a message"/>
+                            </FormGroup>
+                            <Button type="submit" color="info" disabled={!this.formIsValid()}>Send</Button>
+                        </Form>
+                        : this.state.sendingMessage || !this.state.haveUserLocation ?
+                        <video className="video" autoPlay loop src="https://media.giphy.com/media/xkC0zz2GObJfy/giphy.mp4"/>
+                        : <CardText>Thanks for submitting a message!</CardText>
+                    }
                 </CardBody>
             </div>
         )

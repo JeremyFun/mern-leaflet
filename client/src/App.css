@@ -19,3 +19,8 @@ body {
   right: 10px;
   background-color: #fff;
 }
+
+.video {
+  height: auto;
+  min-width: 10%;
+}
