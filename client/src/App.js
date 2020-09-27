@@ -57,6 +57,20 @@ class App extends React.Component {
         fetch(API_URL)
             .then(res => res.json())
             .then(messages => {
+                const haveSeenLocation = {}
+                messages = messages.reduce((all, message) => {
+                    debugger;
+                    const key = `${message.latitude.toFixed(2)}${message.longitude.toFixed(2)}`
+                    if (haveSeenLocation[key]) {
+                        console.log(haveSeenLocation[key], 'key')
+                        haveSeenLocation[key].otherMessages = haveSeenLocation[key].otherMessages || []
+                        haveSeenLocation[key].otherMessages.push(message)
+                    } else {
+                        haveSeenLocation[key] = message;
+                        all.push(message);
+                    }
+                    return all;
+                }, [])
                 this.setState({
                     messages
                 })
@@ -165,9 +179,10 @@ class App extends React.Component {
                     }
                     {
                         this.state.messages.map(message => {
-                            return (<Marker position={[message.latitude, message.longitude]} icon={messagesIcon}>
+                            return (<Marker key={message._id} position={[message.latitude, message.longitude]} icon={messagesIcon}>
                                 <Popup>
-                                    <em>{message.name}</em>: {message.message}
+                                    <p><em>{message.name}</em>{message.message}</p>
+                                    { message.otherMessages ? message.otherMessages.map(message => <p key={message._id}><em>{message.name}</em> : {message.message}</p>) : "" }
                                 </Popup>
                             </Marker>)
                         })
