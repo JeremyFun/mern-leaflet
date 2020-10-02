@@ -15,7 +15,7 @@ body {
 .message-form {
   z-index: 999;
   position: absolute;
-  top: 10px;
+  top: 100px;
   right: 10px;
   background-color: #fff;
 }
@@ -23,4 +23,11 @@ body {
 .video {
   height: auto;
   min-width: 10%;
+}
+
+.navbar-light .navbar-nav .nav-link {
+  color: white;
+}
+.navbar-light .navbar-nav .nav-link :hover{
+  color: red;
 }
