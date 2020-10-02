@@ -1,6 +1,7 @@
 import React from "react";
 import {Button, CardBody, CardText, CardTitle, Form, FormGroup, Input, Label} from "reactstrap";
 import {Preloader} from "./Preloader";
+import { Redirect } from "react-router-dom";
 
 export default (props) => {
 return (
@@ -11,7 +12,7 @@ return (
         {!props.sendingMessage && !props.sentMessage && props.haveUserLocation ?
             <Form onSubmit={props.formSubmitted}>
                 <FormGroup>
-                    <Label for="name">Name</Label>
+                    <Label for="name" className="text-primary font-weight-light">Name</Label>
                     <Input
                         onChange={props.valueChanged}
                         type="text"
@@ -20,7 +21,7 @@ return (
                         placeholder="Enter your name"/>
                 </FormGroup>
                 <FormGroup>
-                    <Label for="message">Message</Label>
+                    <Label for="message" className="text-primary font-weight-light">Message</Label>
                     <Input
                         onChange={props.valueChanged}
                         type="textarea"
@@ -29,6 +30,7 @@ return (
                         placeholder="Enter a message" />
                 </FormGroup>
                 <Button type="submit" color="info" disabled={!props.formIsValid()}>Send</Button>
+                <Button color="info" style={{marginLeft: "10%"}} onClick={props.quitWithMessage}>Quit</Button>
             </Form>
             : props.sendingMessage || !props.haveUserLocation ?
                 <Preloader />

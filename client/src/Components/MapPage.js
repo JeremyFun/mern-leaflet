@@ -72,6 +72,12 @@ export class MapPage extends React.Component {
         })
     }
 
+    quitWithMessage = () => {
+        this.setState({
+            showMessage: false
+        })
+    }
+
     formIsValid = () => {
         const userMessage = {
             name: this.state.userMessage.name,
@@ -173,6 +179,7 @@ export class MapPage extends React.Component {
                             formSubmitted={this.formSubmitted}
                             valueChanged={this.valueChanged}
                             formIsValid={this.formIsValid}
+                            quitWithMessage={this.quitWithMessage}
                         />
                 }
 

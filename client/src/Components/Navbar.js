@@ -26,7 +26,7 @@ export const NavbarMenu = () => {
 
     const toggle = () => setIsOpen(!isOpen);
     return (
-        <Navbar className="bg-info" light expand="md">
+        <Navbar className="bg-info" light expand="md" >
             <NavbarBrand href="/" className={pathname === "/" ? "active" : " "}>
                 <img src={HomePage}/>
             </NavbarBrand>
@@ -34,7 +34,7 @@ export const NavbarMenu = () => {
             <Collapse isOpen={isOpen} navbar>
                 <Nav className="mr-auto" navbar>
                     <NavItem>
-                        <NavLink href="/map">Maps</NavLink>
+                        <NavLink href="/map" style={{"hover": "red"}}>Maps</NavLink>
                     </NavItem>
                     <NavItem>
                         <NavLink
@@ -62,7 +62,7 @@ export const NavbarMenu = () => {
                         </DropdownMenu>
                     </UncontrolledDropdown>
                 </Nav>
-                <NavbarText style={{"color": "white", paddingLeft: "10px", fontSize: "18px", formStyle: "italic"}}>made Yatsiy V. 💚</NavbarText>
+                <NavbarText style={{color: "white", paddingLeft: "20px", fontSize: "18px", formStyle: "italic"}}>made Yatsiy V. 💚</NavbarText>
             </Collapse>
         </Navbar>
     )
