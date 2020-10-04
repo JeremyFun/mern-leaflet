@@ -27,7 +27,43 @@ body {
 
 .navbar-light .navbar-nav .nav-link {
   color: white;
+  font-style: normal;
+  font-size: 20px;
+  font-weight: bold;
+  font-family: Roboto;
 }
-.navbar-light .navbar-nav .nav-link :hover{
+.nav-link .nav:hover {
   color: red;
+}
+
+.nav-vl a:hover{
+  color: red;
+}
+
+.basemaps-container {
+  position: absolute;
+  top: 3%;
+  right: 20%;
+  z-index: 1000;
+  border-radius: 20px;
+}
+
+.button-widget {
+  position: fixed;
+  top: 120px;
+  right: 20px;
+  z-index: 1000;
+}
+
+
+.geojson-toggle{
+  position: absolute;
+  top: 40px;
+  right: 20px;
+  z-index: 1000;
+  margin-top: 20px;
+  background: white;
+  font-size: 14px;
+  padding: 4px;
+  border-radius: 3px;
 }

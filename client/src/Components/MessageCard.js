@@ -1,7 +1,6 @@
 import React from "react";
 import {Button, CardBody, CardText, CardTitle, Form, FormGroup, Input, Label} from "reactstrap";
 import {Preloader} from "./Preloader";
-import { Redirect } from "react-router-dom";
 
 export default (props) => {
 return (

@@ -32,17 +32,20 @@ export const NavbarMenu = () => {
             </NavbarBrand>
             <NavbarToggler onClick={toggle}/>
             <Collapse isOpen={isOpen} navbar>
-                <Nav className="mr-auto" navbar>
-                    <NavItem>
-                        <NavLink href="/map" style={{"hover": "red"}}>Maps</NavLink>
-                    </NavItem>
+                <Nav className="mr-auto nav-vl" navbar>
                     <NavItem>
                         <NavLink
                             href="/"
-                            className={pathname === "/about-authors" ? "active" : " "}
+                            className={pathname === "/" ? "active" : " "}
                         >
-                            About authors
+                            About
                         </NavLink>
+                    </NavItem>
+                    <NavItem>
+                        <NavLink
+                            href="/map"
+                            className={pathname === "/map" ? "active" : " "}
+                        >Map</NavLink>
                     </NavItem>
                     <UncontrolledDropdown nav inNavbar>
                         <DropdownToggle nav caret>

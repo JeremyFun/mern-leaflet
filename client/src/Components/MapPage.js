@@ -14,6 +14,9 @@ import myIcon from '../assets/svg/my-location.svg'
 
 
 import {Button} from 'reactstrap';
+import Basemap from "./Basemap";
+import GeojsonLayer from "./GeojsonLayer";
+import CoordInsert from "./CoordInsert";
 
 export const messagesIcon = new L.Icon({
     iconUrl: messageIcon,
@@ -45,7 +48,12 @@ export class MapPage extends React.Component {
         sendingMessage: false,
         showMessage: false,
         sentMessage: false,
-        messages: []
+        messages: [],
+
+        basemap: 'osm',
+
+        geojsonvisible: false,
+        // visibleModal: false,
     }
 
     componentDidMount() {
@@ -127,14 +135,44 @@ export class MapPage extends React.Component {
         }))
     }
 
+    onBMChange = (bm) => {
+        // console.log(this);
+        this.setState({
+            basemap: bm
+        });
+    }
+
+    // onCoordInsertChange = (lat, lng, z) => {
+    //     this.setState({
+    //         location: {
+    //             lat: lat,
+    //             lng: lng,
+    //             zoom: z,
+    //         }
+    //     });
+    // }
+    //
+    onGeojsonToggle = (e) => {
+        this.setState({
+            geojsonvisible: e.currentTarget.checked
+        });
+    }
+
     render() {
         const position = [this.state.location.lat, this.state.location.lng]
+
+        const basemapsDict = {
+            osm: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            hot: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+            dark: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png",
+            cycle: "https://dev.{s}.tile.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png"
+        }
         return (
             <div className="map">
                 <Map className="map" center={position} zoom={this.state.zoom}>
                     <TileLayer
                         attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        url={basemapsDict[this.state.basemap]}
                     />
                     {
                         this.state.haveUserLocation
@@ -152,15 +190,26 @@ export class MapPage extends React.Component {
                                 <Popup>
                                     <p><em>{message.name}</em>{message.message}</p>
                                     {message.otherMessages ? message.otherMessages.map(message => <p key={message._id}>
-                                        <em>{message.name}</em> : {message.message}</p>) : ""}
+                                        <em>{message.name}</em>  :  {message.message}</p>) : ""}
                                 </Popup>
                             </Marker>)
                         })
                     }
                 </Map>
-                {
+                <Basemap basemap={this.state.basemap} onChange={this.onBMChange}/>
 
+                <div className="geojson-toggle">
+                    <label htmlFor="layertoggle">Toggle Geojson </label>
+                    <input type="checkbox"
+                           name="layertoggle" id="layertoggle"
+                           value={this.state.geojsonvisible} onChange={this.onGeojsonToggle}/>
+                </div>
+
+                {this.state.geojsonvisible &&
+                <GeojsonLayer url="geojson.json" />
                 }
+
+                {/*<CoordInsert onllzChange={this.onCoordInsertChange}/>*/}
                 {
                     !this.state.showMessage
                         ?
