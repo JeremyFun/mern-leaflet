@@ -1,7 +1,7 @@
 import React from 'react';
 import '../App.css';
 
-import {Map, TileLayer, Marker, Popup} from 'react-leaflet'
+import {Map, GeoJSON, TileLayer, Marker, Popup} from 'react-leaflet'
 import L from 'leaflet'
 import Joi from 'joi'
 
@@ -12,11 +12,9 @@ import {getMessages, getLocation, sendMessage} from "../API/API";
 import messageIcon from '../assets/svg/message-location.svg'
 import myIcon from '../assets/svg/my-location.svg'
 
-
 import {Button} from 'reactstrap';
 import Basemap from "./Basemap";
-import GeojsonLayer from "./GeojsonLayer";
-import CoordInsert from "./CoordInsert";
+import mapData from "../data/countries.json"
 
 export const messagesIcon = new L.Icon({
     iconUrl: messageIcon,
@@ -51,10 +49,12 @@ export class MapPage extends React.Component {
         messages: [],
 
         basemap: 'osm',
-
-        geojsonvisible: false,
-        // visibleModal: false,
+        color: "#ffff00",
+        isCountry: false
     }
+
+    colors = ["green", "blue", "yellow", "orange", "grey"];
+
 
     componentDidMount() {
         getMessages()
@@ -72,7 +72,48 @@ export class MapPage extends React.Component {
                     zoom: 13,
                 })
             })
+        console.log(mapData);
     }
+
+
+
+    countryStyle = {
+        fillColor: "red",
+        fillOpacity: 1,
+        color: "black",
+        weight: 2,
+    };
+
+    printMesssageToConsole = (event) => {
+        console.log("Clicked");
+    };
+
+    changeCountryColor = (event) => {
+        event.target.setStyle({
+            color: "green",
+            fillColor: this.state.color,
+            fillOpacity: 1,
+        });
+    };
+
+    onEachCountry = (country, layer) => {
+        const countryName = country.properties.ADMIN;
+        console.log(countryName);
+        layer.bindPopup(countryName);
+
+        layer.options.fillOpacity = Math.random(); //0-1 (0.1, 0.2, 0.3)
+        // const colorIndex = Math.floor(Math.random() * this.colors.length);
+        // layer.options.fillColor = this.colors[colorIndex]; //0
+
+        layer.on({
+            click: this.changeCountryColor,
+        });
+    };
+
+    colorChange = (event) => {
+        this.setState({ color: event.target.value });
+    };
+
 
     showMessage = () => {
         this.setState({
@@ -136,27 +177,25 @@ export class MapPage extends React.Component {
     }
 
     onBMChange = (bm) => {
-        // console.log(this);
         this.setState({
             basemap: bm
         });
     }
 
-    // onCoordInsertChange = (lat, lng, z) => {
-    //     this.setState({
-    //         location: {
-    //             lat: lat,
-    //             lng: lng,
-    //             zoom: z,
-    //         }
-    //     });
-    // }
-    //
-    onGeojsonToggle = (e) => {
+    showCountry = () => {
         this.setState({
-            geojsonvisible: e.currentTarget.checked
-        });
+            isCountry: true,
+            zoom: 5
+        })
     }
+
+    unCounty = () => {
+        this.setState({
+            isCountry: false,
+            zoom: 13
+        })
+    }
+
 
     render() {
         const position = [this.state.location.lat, this.state.location.lng]
@@ -188,28 +227,28 @@ export class MapPage extends React.Component {
                             return (<Marker key={message._id} position={[message.latitude, message.longitude]}
                                             icon={messagesIcon}>
                                 <Popup>
-                                    <p><em>{message.name}</em>{message.message}</p>
+                                    <p><em className="message-name">{message.name}</em>   :   {message.message}</p>
                                     {message.otherMessages ? message.otherMessages.map(message => <p key={message._id}>
-                                        <em>{message.name}</em>  :  {message.message}</p>) : ""}
+                                        <em className="message-name">{message.name}</em>  :  {message.message}</p>) : ""}
                                 </Popup>
                             </Marker>)
                         })
                     }
+                    {this.state.isCountry ? <GeoJSON
+                        style={this.countryStyle}
+                        data={mapData.features}
+                        onEachFeature={this.onEachCountry}
+                    /> : ""}
+
                 </Map>
+
                 <Basemap basemap={this.state.basemap} onChange={this.onBMChange}/>
 
-                <div className="geojson-toggle">
-                    <label htmlFor="layertoggle">Toggle Geojson </label>
-                    <input type="checkbox"
-                           name="layertoggle" id="layertoggle"
-                           value={this.state.geojsonvisible} onChange={this.onGeojsonToggle}/>
-                </div>
-
-                {this.state.geojsonvisible &&
-                <GeojsonLayer url="geojson.json" />
-                }
-
-                {/*<CoordInsert onllzChange={this.onCoordInsertChange}/>*/}
+                {this.state.isCountry ? <input
+                    type="color"
+                    value={this.state.color}
+                    onChange={this.colorChange}
+                /> : ""}
                 {
                     !this.state.showMessage
                         ?
@@ -231,9 +270,18 @@ export class MapPage extends React.Component {
                             quitWithMessage={this.quitWithMessage}
                         />
                 }
-
+                {this.state.isCountry ?
+                    !this.state.showMessage ? <Button outline
+                            color="primary"
+                            onClick={this.unCounty}
+                            className="message-form-two"
+                    >Exit with mode</Button> : ""
+                    : !this.state.showMessage ? <Button outline
+                         color="primary"
+                         onClick={this.showCountry}
+                         className="message-form-two"
+                >Highlight countries</Button> : ""}
             </div>
-
         )
     }
 }
