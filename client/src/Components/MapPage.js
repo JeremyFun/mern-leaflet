@@ -9,12 +9,14 @@ import MessageCard from "./MessageCard";
 
 import {getMessages, getLocation, sendMessage} from "../API/API";
 
-import messageIcon from '../assets/svg/message-location.svg'
-import myIcon from '../assets/svg/my-location.svg'
+import messageIcon from '../assets/svg/message-location.svg';
+import myIcon from '../assets/svg/my-location.svg';
 
-import {Button} from 'reactstrap';
+import {Button, FormGroup, Label, Input} from 'reactstrap';
+
 import Basemap from "./Basemap";
-import mapData from "../data/countries.json"
+import mapData from "../data/countries.json";
+import GeojsonLayer from "./GeojsonLayerFunc";
 
 export const messagesIcon = new L.Icon({
     iconUrl: messageIcon,
@@ -30,6 +32,8 @@ const schema = Joi.object().keys({
     name: Joi.string().min(1).max(500).required(),
     message: Joi.string().min(1).max(500).required(),
 })
+
+L.Icon.Default.imagePath = "https://unpkg.com/leaflet@1.5.0/dist/images/";
 
 export class MapPage extends React.Component {
     state = {
@@ -50,9 +54,10 @@ export class MapPage extends React.Component {
 
         basemap: 'osm',
         color: "#ffff00",
-        isCountry: false
-    }
+        isCountry: false,
 
+        geojsonvisible: false,
+    }
     colors = ["green", "blue", "yellow", "orange", "grey"];
 
 
@@ -63,6 +68,23 @@ export class MapPage extends React.Component {
                     messages,
                     zoom: 3.5
                 })
+                if (this.state.messages.length === 0) {
+                    this.setState({
+                        messages: [
+                            {_id: "5f7a5a6545d74c7b01d32559", name: "Yatsiy Vladislav", message: "This place is cool!", latitude: 50.4501, longitude: 30.5234, date: "2020-10-04T23:29:55.002Z"},
+                            {_id: "5f7a5af345d74c7b01d3255a", name: "Ivan", message: "THis is is is!", latitude: 52.520007, longitude: 13.404954, date: "2020-10-04T23:29:55.002Z"},
+                            {_id: "5f7a5b2c45d74c7b01d3255b", name: "Hex", message: "This isisi silsd;fjlkdsj fksjd klfjsl!", latitude: 51.507351, longitude: -0.127758, date: "2020-10-04T23:29:55.002Z"},
+                            {_id: "5f7a5b4845d74c7b01d3255c", name: "Jack", message: "sjdhfklsdjklfjskdlfjkls j flskdjfkl ", latitude: 55.755826, longitude: 37.6173, date: "2020-10-04T23:29:55.002Z"},
+                            {_id: "5f7a5b6545d74c7b01d3255d", name: "Hejj", message: "sdjfksljdkf sdklfjk sldjfkl s!", latitude: 37.386052, longitude: -122.083851, date: "2020-10-04T23:29:55.002Z"},
+                            {_id: "5f7a5b9245d74c7b01d3255e", name: "Berx", message: "TH lksldfkfl;sdk fsdl;kf l;dsk;f ", latitude: 19.075984, longitude: 72.877656, date: "2020-10-04T23:29:55.002Z"},
+                            {_id: "5f7a5bcf45d74c7b01d3255f", name: "Yura", message: "The complete sentenses!", latitude: 37.774929, longitude: -122.419416, date: "2020-10-04T23:29:55.002Z"},
+                            {_id: "5f7a5c0145d74c7b01d32560", name: "Uri", message: "Hello ", latitude: 31.230416, longitude: 121.473701, date: "2020-10-04T23:29:55.002Z"},
+                            {_id: "5f7a5c2245d74c7b01d32561", name: "Pail", message: "Helll oodaspfkl;j dsfjkljfsd!", latitude: -23.55052, longitude: -46.633309, date: "2020-10-04T23:29:55.002Z"},
+                            {_id: "5f7a5c3e45d74c7b01d32562", name: "HEkc", message: "JJLF;SDKL; FKSDL;K FL;SD", latitude: 35.689487, longitude: 139.691706, date: "2020-10-04T23:29:55.002Z"},
+                            {_id: "5f7b3aa9f3c915122e75cf12", name: "dsfsd", message: "fsdfsd", latitude: 50.4365056, longitude: 30.503731199999994, date: "2020-10-04T23:29:55.002Z"}
+                        ]
+                    })
+                }
             })
         getLocation()
             .then(location => {
@@ -76,9 +98,8 @@ export class MapPage extends React.Component {
     }
 
 
-
     countryStyle = {
-        fillColor: "red",
+        fillColor: "orange",
         fillOpacity: 1,
         color: "black",
         weight: 2,
@@ -111,13 +132,14 @@ export class MapPage extends React.Component {
     };
 
     colorChange = (event) => {
-        this.setState({ color: event.target.value });
+        this.setState({color: event.target.value});
     };
 
 
     showMessage = () => {
         this.setState({
-            showMessage: true
+            showMessage: true,
+            zoom: 14
         })
     }
 
@@ -197,6 +219,15 @@ export class MapPage extends React.Component {
     }
 
 
+    onGeojsonToggle = (e) => {
+
+        this.setState({
+            geojsonvisible: e.currentTarget.checked,
+            zoom: 4
+        });
+    }
+
+
     render() {
         const position = [this.state.location.lat, this.state.location.lng]
 
@@ -227,9 +258,9 @@ export class MapPage extends React.Component {
                             return (<Marker key={message._id} position={[message.latitude, message.longitude]}
                                             icon={messagesIcon}>
                                 <Popup>
-                                    <p><em className="message-name">{message.name}</em>   :   {message.message}</p>
+                                    <p><em className="message-name">{message.name}</em> : {message.message}</p>
                                     {message.otherMessages ? message.otherMessages.map(message => <p key={message._id}>
-                                        <em className="message-name">{message.name}</em>  :  {message.message}</p>) : ""}
+                                        <em className="message-name">{message.name}</em> : {message.message}</p>) : ""}
                                 </Popup>
                             </Marker>)
                         })
@@ -239,16 +270,37 @@ export class MapPage extends React.Component {
                         data={mapData.features}
                         onEachFeature={this.onEachCountry}
                     /> : ""}
+                    <FormGroup check className="message-form-three">
+                        <Label check>{/*<div className="geojson-toggle">*/}
+                    {/*    <label htmlFor="layertoggle">Toggle Geojson </label>*/}
+                    {/*    <input type="checkbox"*/}
+                    {/*           name="layertoggle" id="layertoggle"*/}
+                    {/*           value={this.state.geojsonvisible} onChange={this.onGeojsonToggle}/>*/}
+                    {/*</div>*/}
+                            <Input type="checkbox"
+                                   name="layertoggle"
+                                   id="layertoggle"
+                                   size="sm"
+                                   style={{width: "20px"}}
+                                   value={this.state.geojsonvisible}
+                                   onChange={this.onGeojsonToggle}
+                            />
+                            Check me
+                        </Label>
+                    </FormGroup>
 
+                    {this.state.geojsonvisible && <GeojsonLayer url="places.json" cluster={true}/>}
                 </Map>
 
                 <Basemap basemap={this.state.basemap} onChange={this.onBMChange}/>
 
-                {this.state.isCountry ? <input
-                    type="color"
-                    value={this.state.color}
-                    onChange={this.colorChange}
-                /> : ""}
+                {
+                    this.state.isCountry ? <input
+                        type="color"
+                        value={this.state.color}
+                        onChange={this.colorChange}
+                    /> : ""
+                }
                 {
                     !this.state.showMessage
                         ?
@@ -270,17 +322,19 @@ export class MapPage extends React.Component {
                             quitWithMessage={this.quitWithMessage}
                         />
                 }
-                {this.state.isCountry ?
-                    !this.state.showMessage ? <Button outline
-                            color="primary"
-                            onClick={this.unCounty}
-                            className="message-form-two"
-                    >Exit with mode</Button> : ""
-                    : !this.state.showMessage ? <Button outline
-                         color="primary"
-                         onClick={this.showCountry}
-                         className="message-form-two"
-                >Highlight countries</Button> : ""}
+                {
+                    this.state.isCountry ?
+                        !this.state.showMessage ? <Button outline
+                                                          color="primary"
+                                                          onClick={this.unCounty}
+                                                          className="message-form-two"
+                        >Exit with mode</Button> : ""
+                        : !this.state.showMessage ? <Button outline
+                                                            color="primary"
+                                                            onClick={this.showCountry}
+                                                            className="message-form-two"
+                        >Highlight countries</Button> : ""
+                }
             </div>
         )
     }
