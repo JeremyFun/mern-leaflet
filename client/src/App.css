@@ -1,3 +1,5 @@
+@import '~leaflet/dist/leaflet.css';
+@import '~react-leaflet-markercluster/dist/styles.min.css';
 body {
   margin: 0;
   width: 100vw;
@@ -18,6 +20,26 @@ body {
   top: 100px;
   right: 10px;
   background-color: #fff;
+}
+
+.message-form-two {
+  z-index: 999;
+  position: absolute;
+  top: 100px;
+  right: 150px;
+  background-color: #fff;
+}
+
+.message-form-three {
+  z-index: 999;
+  position: absolute;
+  right: 15%;
+  top: 15px;
+  background-color: #fff;
+  font-style: italic;
+  font-size: 26px;
+  font-family: Roboto;
+  height: auto;
 }
 
 .video {
@@ -66,4 +88,18 @@ body {
   font-size: 14px;
   padding: 4px;
   border-radius: 3px;
+}
+
+.message-name {
+  font-weight: bold;
+  font-family: Roboto;
+}
+
+.leaflet-popup-content {
+  background-color: #ffffff;
+  color: black;
+}
+
+.class {
+  position: relative;
 }
