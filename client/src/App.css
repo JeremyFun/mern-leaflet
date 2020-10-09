@@ -33,7 +33,7 @@ body {
 .message-form-three {
   z-index: 999;
   position: absolute;
-  right: 15%;
+  right: 25%;
   top: 15px;
   background-color: #fff;
   font-style: italic;

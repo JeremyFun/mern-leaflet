@@ -4,9 +4,9 @@
   "description": " A basic starter for an express.js API",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
-    "lint": "eslint --fix src",
+    "start": "node ../../../Music/react-leaflet-master/server/src/index.js",
+    "dev": "nodemon ../../../Music/react-leaflet-master/server/src/index.js",
+    "lint": "eslint --fix ../../../Music/react-leaflet-master/server/src",
     "test": "mocha --exit"
   },
   "keywords": [],
