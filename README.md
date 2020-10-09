@@ -10,7 +10,7 @@ React wrapper of [react-leaflet](https://github.com/PaulLeCam/react-leaflet)
 # Description
 This application uses the mongodb database that automatically connects to your database, but for this you must have the database client loaded on your pc, below there will be a link to install the database.
 Choose the operating system you need on your pc, maybe it's Windows or Linux.
-If you are using Linux as I am, then install the ROBO3T application, through it you can conveniently use the database
+If you are using Linux as I am, then install the Robo3t application, through it you can conveniently use the database
 ![React leaflet markercluster](./ROBO3T.png)
 # GETTING STARTED
 **1.** Download MongoDB:
